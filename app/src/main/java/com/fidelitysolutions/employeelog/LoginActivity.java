@@ -76,7 +76,12 @@ public class LoginActivity extends AppCompatActivity {
                                     public void onComplete(@NonNull Task<AuthResult> task) {
                                         hideDialogue();
                                         //redirect user to user dashboard
-                                        redirectUserDashBoardScreen();
+                                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                        if(user != null) {
+                                            redirectUserDashBoardScreen();
+                                        } else {
+                                            Toast.makeText(LoginActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+                                        }
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                             @Override
