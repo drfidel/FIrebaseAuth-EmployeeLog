@@ -2,6 +2,9 @@ package com.fidelitysolutions.employeelog;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,7 +31,7 @@ public class SignUpActivity extends AppCompatActivity implements CompoundButton.
 
     private static final String TAG = "SignUpActivity";
 
-    private static final String DOMAIN_NAME = "tabian.ca";
+    private static final String DOMAIN_NAME = "gmail.com";
 
     //widgets
     private EditText mEmail, mPassword, mConfirmPassword;
@@ -60,6 +63,7 @@ public class SignUpActivity extends AppCompatActivity implements CompoundButton.
         mAlreadySigned = findViewById(R.id.tvHaveAccount);
         mAcceptTCs = findViewById(R.id.cbxAgreeTerms);
 
+
         hideDialogue();
 
         mAcceptTCs.setOnCheckedChangeListener(this);
@@ -69,6 +73,7 @@ public class SignUpActivity extends AppCompatActivity implements CompoundButton.
         mAlreadySigned.setOnClickListener((view) -> {
             redirectLoginScreen();
         });
+
 
         //sign-Up
         mSignUp.setOnClickListener(view -> {
@@ -101,6 +106,8 @@ public class SignUpActivity extends AppCompatActivity implements CompoundButton.
         hideSoftKeyboard();
 
     }
+
+
 
     /**
     * Send verification email
@@ -198,6 +205,7 @@ public class SignUpActivity extends AppCompatActivity implements CompoundButton.
         startActivity(intent);
         finish();
     }
+
 
     private void showDialogue(){
         mProgressBar.setVisibility(View.VISIBLE);
