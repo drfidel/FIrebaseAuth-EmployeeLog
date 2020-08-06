@@ -2,6 +2,9 @@ package com.fidelitysolutions.employeelog;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,6 +23,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 //import static android.text.TextUtils.isEmpty;
 
@@ -27,7 +31,7 @@ public class SignUpActivity extends AppCompatActivity implements CompoundButton.
 
     private static final String TAG = "SignUpActivity";
 
-    private static final String DOMAIN_NAME = "tabian.ca";
+    private static final String DOMAIN_NAME = "gmail.com";
 
     //widgets
     private EditText mEmail, mPassword, mConfirmPassword;
@@ -59,6 +63,7 @@ public class SignUpActivity extends AppCompatActivity implements CompoundButton.
         mAlreadySigned = findViewById(R.id.tvHaveAccount);
         mAcceptTCs = findViewById(R.id.cbxAgreeTerms);
 
+
         hideDialogue();
 
         mAcceptTCs.setOnCheckedChangeListener(this);
@@ -68,6 +73,7 @@ public class SignUpActivity extends AppCompatActivity implements CompoundButton.
         mAlreadySigned.setOnClickListener((view) -> {
             redirectLoginScreen();
         });
+
 
         //sign-Up
         mSignUp.setOnClickListener(view -> {
@@ -102,6 +108,28 @@ public class SignUpActivity extends AppCompatActivity implements CompoundButton.
     }
 
 
+
+    /**
+    * Send verification email
+    * */
+    private void sendVerificationEmail(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null){
+            user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        Toast.makeText(SignUpActivity.this, "Send Verification Email", Toast.LENGTH_SHORT).show();
+                    }else {
+                        Toast.makeText(SignUpActivity.this, "Couldn't send verification Email", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+    }
+
+
     /**
      * Signup new user
      * @param
@@ -119,7 +147,14 @@ public class SignUpActivity extends AppCompatActivity implements CompoundButton.
                         if(task.isSuccessful()){
                             Log.d(TAG, "onComplete: Authstate:"+
                                     FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+                            sendVerificationEmail();
+
                             FirebaseAuth.getInstance().signOut();
+
+                            //redirect user to login screen
+                            redirectLoginScreen();
+
                         } else {
                             Toast.makeText(SignUpActivity.this, "Unable to SignUP", Toast.LENGTH_SHORT).show();
                         }
@@ -170,6 +205,7 @@ public class SignUpActivity extends AppCompatActivity implements CompoundButton.
         startActivity(intent);
         finish();
     }
+
 
     private void showDialogue(){
         mProgressBar.setVisibility(View.VISIBLE);

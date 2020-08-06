@@ -2,6 +2,8 @@ package com.fidelitysolutions.employeelog;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,13 +31,13 @@ public class LoginActivity extends AppCompatActivity {
     //firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
 
-    private static final String DOMAIN_NAME = "tabian.ca";
+    private static final String DOMAIN_NAME = "gmail.com";
 
     //widgets
     private EditText mEmail, mPassword;
     private Button mSignIn;
     private ProgressBar mProgressBar;
-    private TextView mNotRegistered;
+    private TextView mNotRegistered, mResendVerificationMail;;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
         mSignIn = findViewById(R.id.buSignIn);
         mProgressBar = findViewById(R.id.progressBar2);
         mNotRegistered = findViewById(R.id.tvIfnotRegistered);
+        mResendVerificationMail = findViewById(R.id.tvResendVerificationMail);
 
         hideDialogue();
 
@@ -57,6 +60,11 @@ public class LoginActivity extends AppCompatActivity {
 
         //get status of auth
         setupFirebaseAuth();
+
+        //Redirect to Verification screen
+        mResendVerificationMail.setOnClickListener((view) -> {
+            redirectSendVerification();
+        });
 
         mSignIn.setOnClickListener((view) -> {
             //Check if fields are filled out
@@ -144,6 +152,31 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Resend verification email
+     * */
+    private void redirectSendVerification() {
+        Log.d(TAG, "redirectSendVerification: redirect to verification email");
+
+        ResendVerificationEmailFragment dialogFragment = new ResendVerificationEmailFragment();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("notAlertDialog", true);
+
+        dialogFragment.setArguments(bundle);
+
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+
+        dialogFragment.show(ft, "dialog");
+    }
+
     private void showDialogue(){
         mProgressBar.setVisibility(View.VISIBLE);
     }
@@ -159,7 +192,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /*
-    * ------------------setup firebase authlistener------------------------
+    * ------------------setup firebase auth-listener------------------------
     * */
     private void setupFirebaseAuth(){
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -168,8 +201,23 @@ public class LoginActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
 
                 if(user != null){
-                    Log.d(TAG, "onAuthStateChanged: signed_in:" + user.getUid());
+                    if(user.isEmailVerified()){
+                        Log.d(TAG, "onAuthStateChanged: signed_in:" + user.getUid());
+                        Toast.makeText(LoginActivity.this, "Authenticated with:"+ user.getEmail(),
+                                Toast.LENGTH_SHORT).show();
+
+//                        Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+//                        startActivity(intent);
+//                        finish();
+
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Check your Email Inbox for a verification link",
+                                Toast.LENGTH_SHORT).show();
+                        FirebaseAuth.getInstance().signOut();
+                    }
+
                 } else {
+                    //User is signed out
                     Log.d(TAG, "onAuthStateChanged: signed_out");
                 }
             }
@@ -185,6 +233,12 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
     }
 }

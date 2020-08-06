@@ -19,4 +19,8 @@
     <string name="stringSignUPifNot">Not yet signed up?</string>
     <string name="stringLoginIfRegistered">Have account?</string>
     <string name="StringCbxResAgreeTerms">Agree To Terms</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="StringTVResendVerEmail">Resend Verification Email</string>
+    <string name="action_signout">Sign Out</string>
 </resources>
