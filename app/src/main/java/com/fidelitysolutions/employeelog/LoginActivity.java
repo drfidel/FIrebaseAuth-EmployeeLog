@@ -192,7 +192,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /*
-    * ------------------setup firebase authlistener------------------------
+    * ------------------setup firebase auth-listener------------------------
     * */
     private void setupFirebaseAuth(){
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -206,9 +206,9 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this, "Authenticated with:"+ user.getEmail(),
                                 Toast.LENGTH_SHORT).show();
 
-                        Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-                        startActivity(intent);
-                        finish();
+//                        Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+//                        startActivity(intent);
+//                        finish();
 
                     } else {
                         Toast.makeText(LoginActivity.this, "Check your Email Inbox for a verification link",
@@ -233,6 +233,12 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
     }
 }
