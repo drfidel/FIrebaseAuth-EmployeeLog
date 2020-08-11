@@ -1,6 +1,7 @@
 package com.fidelitysolutions.employeelog;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -8,11 +9,14 @@ import android.view.View;
 import android.view.Menu;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
@@ -60,6 +64,48 @@ public class UserDashBoardActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+       // getUserDetails();
+        setUserDetails();
+    }
+
+    //setUser Details
+    private void setUserDetails(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null){
+            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().
+                    setDisplayName("Akiyo Fidel").
+                    setPhotoUri(Uri.parse("http://www.google.com/wallpaper.jpg")).build();
+
+            user.updateProfile(profileUpdates)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()){
+                                Log.d(TAG, "onComplete: User Profile updated");
+
+                                getUserDetails();
+                            }
+                        }
+                    });
+        }
+    }
+
+    private void getUserDetails(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null){
+            String uid = user.getUid();
+            String name = user.getDisplayName();
+            String email = user.getEmail();
+            Uri photoUrl = user.getPhotoUrl();
+
+            String properties = "uid: " + uid + "\n" +
+                    "name: " + name + "\n" +
+                    "email: " + email + "\n" +
+                    "photoUrl: " + photoUrl;
+            Log.d(TAG, "getUserDetails: properties: \n" + properties);
+        }
     }
 
     private void setupFirebaseAuth() {
@@ -128,6 +174,7 @@ public class UserDashBoardActivity extends AppCompatActivity {
             Intent intent = new Intent(UserDashBoardActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
+
         } else {
             Log.d(TAG, "checkAuthenticationAuth: user is authenticated");
         }
