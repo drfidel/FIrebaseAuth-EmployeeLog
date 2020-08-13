@@ -19,6 +19,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -76,7 +78,7 @@ public class UserDashBoardActivity extends AppCompatActivity {
         if (user != null){
             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().
                     setDisplayName("Akiyo Fidel").
-                    setPhotoUri(Uri.parse("http://www.google.com/wallpaper.jpg")).build();
+                    setPhotoUri(Uri.parse("https://upload.wikimedia.org/wikipedia/commons/5/5d/Crateva_religiosa.jpg")).build();
 
             user.updateProfile(profileUpdates)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -193,8 +195,34 @@ public class UserDashBoardActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
         switch(item.getItemId()){
-            case R.id.action_settings:
+            case R.id.action_settings:{
+                //code to open settings fragment
+                Log.d(TAG, "onOptionsItemSelected: opened user accounts settings");
+
+                UserSettingsFragment dialogFragment = new UserSettingsFragment();
+                FragmentTransaction ftr = getSupportFragmentManager().beginTransaction();
+
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("notAlertDialog", true);
+
+                dialogFragment.setArguments(bundle);
+
+                ftr = getSupportFragmentManager().beginTransaction();
+                Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+                if (prev != null) {
+                    ftr.remove(prev);
+                }
+                ftr.addToBackStack(null);
+
+
+                dialogFragment.show(ftr, "dialog");}
+
+//                Intent settingsIntent = new Intent(UserDashBoardActivity.this, UserSettingsFragment.class);
+//                //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                startActivity(settingsIntent);
+//                finish();
                 return true;
+
             case R.id.action_signout:
                 //code to signout
                 Log.d(TAG, "onOptionsItemSelected: If sign out selected, signout autustatus");
@@ -204,6 +232,7 @@ public class UserDashBoardActivity extends AppCompatActivity {
                 startActivity(intent);
 
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }

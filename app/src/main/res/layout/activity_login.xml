@@ -22,7 +22,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tvIfnotRegistered" />
 
     <ImageView
-        android:id="@+id/imvAvatar"
+        android:id="@+id/imvNavAvatar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
@@ -43,7 +43,7 @@
         android:hint="@string/StringPlaceHolderUseremail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imvAvatar" />
+        app:layout_constraintTop_toBottomOf="@+id/imvNavAvatar" />
 
     <TextView
         android:id="@+id/tvIfnotRegistered"
