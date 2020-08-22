@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -17,6 +19,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.squareup.picasso.Picasso;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -35,6 +38,12 @@ public class UserDashBoardActivity extends AppCompatActivity {
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
 
+    //navbar views
+    ImageView mProfilePic;
+    TextView mTvProfileName, mTvEmail;
+    View navHeader;
+    NavigationView navigationView;
+
     private AppBarConfiguration mAppBarConfiguration;
 
     @Override
@@ -42,6 +51,13 @@ public class UserDashBoardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_dash_board);
         Log.d(TAG, "onCreate: OnCreateStart.");
+
+        //link nav views with layout
+        navigationView = findViewById(R.id.nav_view);
+        navHeader = navigationView.getHeaderView(0);
+        mProfilePic = navHeader.findViewById(R.id.imvNavAvatar);
+        mTvProfileName= navHeader.findViewById(R.id.tvNavUserDisplayName);
+        mTvEmail= navHeader.findViewById(R.id.tvNavUserEmail);
         
         setupFirebaseAuth();
         
@@ -67,9 +83,11 @@ public class UserDashBoardActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-       // getUserDetails();
-        setUserDetails();
+        getUserDetails();
+        //setUserDetails();
     }
+
+
 
     //setUser Details
     private void setUserDetails(){
@@ -107,6 +125,14 @@ public class UserDashBoardActivity extends AppCompatActivity {
                     "email: " + email + "\n" +
                     "photoUrl: " + photoUrl;
             Log.d(TAG, "getUserDetails: properties: \n" + properties);
+
+            //render in views
+            mTvEmail.setText(email);
+            mTvProfileName.setText(name);
+            //mProfilePic.setImageURI(photoUrl);
+
+            Picasso.get().load(photoUrl).into(mProfilePic);
+
         }
     }
 
@@ -241,6 +267,9 @@ public class UserDashBoardActivity extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+
+        //getUserDetails();
+
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }

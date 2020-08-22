@@ -2,11 +2,15 @@ package com.fidelitysolutions.employeelog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +19,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Picasso;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,6 +57,9 @@ public class UserSettingsFragment extends DialogFragment {
         mBuOkay = view.findViewById(R.id.buOkay);
         mBuCancel = view.findViewById(R.id.buCancel);
 
+        //renderviews
+        getUserDetails();
+
         //When new text is typed in fields below; activate the buttons
         //When the change dp button is clicked; open gallery to get a photo to upload
 
@@ -76,5 +89,29 @@ public class UserSettingsFragment extends DialogFragment {
         });
 
         return view;
+    }
+
+    private void getUserDetails(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null){
+            String uid = user.getUid();
+            String name = user.getDisplayName();
+            String email = user.getEmail();
+            Uri photoUrl = user.getPhotoUrl();
+
+            String properties = "uid: " + uid + "\n" +
+                    "name: " + name + "\n" +
+                    "email: " + email + "\n" +
+                    "photoUrl: " + photoUrl;
+            Log.d(TAG, "getUserDetails: properties: \n" + properties);
+
+            //render in views
+            mEdtSettingsUserEmail.setText(email);
+            mEdtSettingsUserName.setText(name);
+            //mProfilePic.setImageURI(photoUrl);
+
+            Picasso.get().load(photoUrl).into(mProfilePic);
+
+        }
     }
 }
